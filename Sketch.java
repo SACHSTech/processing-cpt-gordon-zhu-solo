@@ -1,4 +1,6 @@
 import processing.core.PApplet;
+import processing.core.PImage;
+
 
 //Main Sketch Class
 public class Sketch extends PApplet {
@@ -8,6 +10,13 @@ public class Sketch extends PApplet {
   float fltPlayerX = 500;
   float fltPlayerY = 650;
 
+  int[][] collisionMap1 = new int[6001][6001]; 
+  int[][] collisionMap2 = new int[6001][6001]; 
+  int[][] collisionMap3 = new int[6001][6001]; 
+
+  PImage imgPlayer; 
+  PImage  imgBackground;
+
 
   // movement
   boolean boolUp = false;
@@ -15,11 +24,12 @@ public class Sketch extends PApplet {
   boolean boolDown = false;
   boolean boolRight = false;
 
+  int intCurrentLevel = 0; 
 
 
   public void settings() {
 	// put your size call here
-    size(1275, 720);
+    size(1000, 667);
   }
 
   /** 
@@ -27,7 +37,14 @@ public class Sketch extends PApplet {
    * values here i.e background, stroke, fill etc.
    */
   public void setup() {
-    background(210, 255, 173);
+
+    //imgPlayer = loadImage("loading");
+    if(intCurrentLevel==0){
+    imgBackground = loadImage("loadingScreen.jpg");
+    }
+    else if(intCurrentLevel==1){
+      
+    }
   }
 
   /**
@@ -35,12 +52,10 @@ public class Sketch extends PApplet {
    */
   public void draw() {
 	  
-	// sample code, delete this stuff
-    stroke(128);
-    line(150, 25, 270, 350);  
+    //loading screen --> 3-5 levels, one locked after another, first one tutorial --> each level has scrolling map 
+    //--> wall detection --> reach a "door" to go to next level. 
 
-    stroke(255);
-    line(50, 125, 70, 50);  
+    image(imgBackground, 0, 0);
   }
   
   
