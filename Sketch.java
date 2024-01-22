@@ -12,15 +12,13 @@ public class Sketch extends PApplet {
   float mapPosY = fltPlayerY;
   int intSpeedX = 0;
   int intSpeedY = 0;
-  int intborderX = 200;
-  int intborderY = 160;
+  int intborderX = 300;
+  int intborderY = 220;
 
-  int[][] collisionMap1 = new int[3001][3001];
-  int[][] collisionMap2 = new int[3001][3001];
-  int[][] collisionMap3 = new int[3001][3001];
-
+  
   PImage imgPlayer;
   PImage imgBackground;
+  PImage imgPermBackground; 
   PImage imglvl1;
   PImage imglvl2;
 
@@ -47,6 +45,7 @@ public class Sketch extends PApplet {
 
     imgBackground = loadImage("loadingScreen.jpg");
     imglvl1 = loadImage("lvl1.png");
+    imgPermBackground = loadImage("permanentBackground.jpg");
 
   }
 
@@ -67,8 +66,8 @@ public class Sketch extends PApplet {
       if (boolInitialize) {
         fltPlayerX = 800;
         fltPlayerY = 300;
-        mapPosX = 800;
-        mapPosY = 300;
+        mapPosX = 500;
+        mapPosY = 200;
         boolInitialize = false;
       }
       movement();
@@ -92,23 +91,23 @@ public class Sketch extends PApplet {
 
     if (Math.abs(width - fltPlayerX) < intborderX) {
       mapPosX -= intSpeedX;
-      mapPosX = Math.max(width - 750, mapPosX);
+      mapPosX = Math.max(width - 850, mapPosX);
     }
     if (Math.abs(height - fltPlayerY) < intborderY) {
       mapPosY -= intSpeedY;
-      mapPosY = Math.max(height - 750, mapPosY);
+      mapPosY = Math.max(height - 800, mapPosY);
     }
     if (fltPlayerX < intborderX) {
       mapPosX -= intSpeedX;
-      mapPosX = Math.min(750, mapPosX);
+      mapPosX = Math.min(850, mapPosX);
     }
     if (fltPlayerY < intborderY) {
       mapPosY -= intSpeedY;
-      mapPosY = Math.min(750, mapPosY);
+      mapPosY = Math.min(800, mapPosY);
     }
-
+    image(imgPermBackground , 0 , 0 );
     image(imgMap, mapPosX - 750, mapPosY - 750);
-    image(imgPlayer, fltPlayerX - 25, fltPlayerY - 37);
+    image(imgPlayer, fltPlayerX - 30, fltPlayerY - 30);
   }
 
   /**
@@ -125,24 +124,24 @@ public class Sketch extends PApplet {
     if (boolUp) {
       intSpeedY = -4;
       fltPlayerY += intSpeedY;
-      fltPlayerY = Math.max(intborderY - 10, fltPlayerY);
+      fltPlayerY = Math.max(intborderY - 20, fltPlayerY);
     }
     if (boolLeft) {
       intSpeedX = -4;
       fltPlayerX += intSpeedX;
-      fltPlayerX = Math.max(intborderX - 10, fltPlayerX);
+      fltPlayerX = Math.max(intborderX - 20, fltPlayerX);
     }
 
     if (boolDown) {
       intSpeedY = 4;
       fltPlayerY += intSpeedY;
-      fltPlayerY = Math.min(height - intborderY + 10, fltPlayerY);
+      fltPlayerY = Math.min(height - intborderY + 20, fltPlayerY);
     }
 
     if (boolRight) {
       intSpeedX = 4;
       fltPlayerX += intSpeedX;
-      fltPlayerX = Math.min(width - intborderX + 10, fltPlayerX);
+      fltPlayerX = Math.min(width - intborderX + 20, fltPlayerX);
     }
 
   }
