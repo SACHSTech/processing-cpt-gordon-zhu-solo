@@ -15,10 +15,9 @@ public class Sketch extends PApplet {
   int intborderX = 300;
   int intborderY = 220;
 
-  
   PImage imgPlayer;
   PImage imgBackground;
-  PImage imgPermBackground; 
+  PImage imgPermBackground;
   PImage imglvl1;
   PImage imglvl2;
 
@@ -42,7 +41,6 @@ public class Sketch extends PApplet {
   public void setup() {
 
     imgPlayer = loadImage("imgPlayer.png");
-
     imgBackground = loadImage("loadingScreen.jpg");
     imglvl1 = loadImage("lvl1.png");
     imgPermBackground = loadImage("permanentBackground.jpg");
@@ -70,8 +68,9 @@ public class Sketch extends PApplet {
         mapPosY = 200;
         boolInitialize = false;
       }
-      movement();
+
       drawMap(imglvl1);
+      movement();
 
     }
 
@@ -105,13 +104,14 @@ public class Sketch extends PApplet {
       mapPosY -= intSpeedY;
       mapPosY = Math.min(800, mapPosY);
     }
-    image(imgPermBackground , 0 , 0 );
+    image(imgPermBackground, 0, 0);
     image(imgMap, mapPosX - 750, mapPosY - 750);
     image(imgPlayer, fltPlayerX - 30, fltPlayerY - 30);
   }
 
   /**
-   * Description: detects movement from keys to move the character
+   * Description: detects movement from keys to move the character. Also accounts
+   * for wall collision
    * 
    * No param
    * No return
@@ -121,10 +121,38 @@ public class Sketch extends PApplet {
   public void movement() {
     intSpeedX = 0;
     intSpeedY = 0;
+    int pixelColor = 0;
+    int[] sumRGB = new int[3];
     if (boolUp) {
-      intSpeedY = -4;
-      fltPlayerY += intSpeedY;
-      fltPlayerY = Math.max(intborderY - 20, fltPlayerY);
+      // if you want to go up, grab the average pixel color of a 5x5 grid upwards of
+      // the character
+      for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+          pixelColor = get((int) fltPlayerX + i - 3, (int) fltPlayerY - 37 + j);
+          // According to documentation, bit shift is faster than "get" method
+          sumRGB[0] += (pixelColor >> 16) & 0xFF; // Red component
+          sumRGB[1] += (pixelColor >> 8) & 0xFF; // Green component
+          sumRGB[2] += pixelColor & 0xFF; // Blue component
+        }
+      }
+      int avgR = sumRGB[0] /25;
+      int avgG = sumRGB[1] / 25;
+      int avgB = sumRGB[2] / 25;
+
+      println(pixelColor);
+      println(red(pixelColor));
+      println(green(pixelColor));
+
+      println(blue(pixelColor));
+      println(pixelColor & 0xFF);
+
+      // checks the average pixel colour moving upwards and allows the character to move upwards if its not a gray color
+      if (!(avgR <= 250 && avgR >= 230 && avgB <= 210 && avgB >= 185
+          && avgG <= 250 && avgG >= 230)) {
+        intSpeedY = -4;
+        fltPlayerY += intSpeedY;
+        fltPlayerY = Math.max(intborderY - 20, fltPlayerY);
+      }
     }
     if (boolLeft) {
       intSpeedX = -4;
