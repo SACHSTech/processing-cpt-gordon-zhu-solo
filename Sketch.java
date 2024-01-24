@@ -20,6 +20,8 @@ public class Sketch extends PApplet {
   int intborderX = 300;
   int intborderY = 220;
 
+  int lives = 30;
+
   // initialization for other methods
   long startTime = System.currentTimeMillis();
   boolean boolMouse = false;
@@ -32,6 +34,14 @@ public class Sketch extends PApplet {
   PImage imglvl2;
   PImage imgFriendlyProjectile;
   PImage imgEnemyProjectile;
+
+  // initialization for enemies
+  int[] enemyPosX = new int[10];
+  int[] enemyPosY = new int[10];
+  int[] enemyLives = new int[10];
+  long[] enemyLastHitTime = new long[10];
+  PImage imgEnemy1;
+  PImage imgEnemy2;
 
   // movement
   boolean boolUp = false;
@@ -58,6 +68,8 @@ public class Sketch extends PApplet {
   // Time
   // Timer mouseCheck = new Timer();
   int lastTime = 0;
+  int lastTime2 = 0;
+  long lastHitTime = 0;
   Timer projectileCheck = new Timer();
 
   public void settings() {
@@ -81,6 +93,11 @@ public class Sketch extends PApplet {
     imgFriendlyProjectile = loadImage("Projectile.png");
     imgEnemyProjectile = loadImage("Projectile2.png");
 
+    imgEnemy1 = loadImage("Enemy.png");
+    imgEnemy2 = loadImage("Enemy2.png");
+
+    manualEnemySpawn();
+
   }
 
   /**
@@ -98,10 +115,10 @@ public class Sketch extends PApplet {
         intCurrentLevel = 1;
     } else if (intCurrentLevel == 1) {
       if (boolInitialize) {
-        fltPlayerX = 800;
+        fltPlayerX = 750;
         fltPlayerY = 500;
-        mapPosX = 500;
-        mapPosY = 200;
+        mapPosX = 400;
+        mapPosY = 100;
         boolInitialize = false;
       }
 
@@ -110,8 +127,29 @@ public class Sketch extends PApplet {
       if (mousePressed) {
         ifMousePressed();
       }
+      drawEnemy();
+      enemyProjectileSpawn();
       drawProjectile();
 
+    }
+    // display lives
+    noStroke();
+    fill(242, 10, 25);
+    if (lives >= 1)
+      rect(950, 20, 30, 30);
+    if (lives >= 2)
+      rect(900, 20, 30, 30);
+    if (lives >= 3)
+      rect(850, 20, 30, 30);
+    if (lives >= 4)
+      rect(800, 20, 30, 30);
+    if (lives >= 5)
+      rect(750, 20, 30, 30);
+
+    // game end
+    if (lives <= 0) {
+      fill(255);
+      rect(0, 0, width, height);
     }
 
   }
@@ -326,7 +364,7 @@ public class Sketch extends PApplet {
     Iterator<Float> iteratorAngles = angles.iterator();
     Iterator<Float> iteratorSpeedX = speedX.iterator();
     Iterator<Float> iteratorSpeedY = speedY.iterator();
-    
+
     Iterator<Integer> iteratorprojectileType = projectileType.iterator();
     Iterator<Integer> iteratorMapX = dqMapX.iterator();
     Iterator<Integer> iteratorMapY = dqMapY.iterator();
@@ -339,7 +377,8 @@ public class Sketch extends PApplet {
       int intProjectileType = iteratorprojectileType.next();
       float speedXValue = iteratorSpeedX.next();
       float speedYValue = iteratorSpeedY.next();
-      //so that when the map scrolls, the projectiles remain at their relative positions
+      // so that when the map scrolls, the projectiles remain at their relative
+      // positions
       int shiftX = iteratorMapX.next();
       shiftX -= mapPosX;
       int shiftY = iteratorMapY.next();
@@ -349,13 +388,35 @@ public class Sketch extends PApplet {
 
       // drawing the actual projectile
       pushMatrix();
-      translate(x + (temp * speedXValue / 5)-shiftX, y + (temp * speedYValue / 5) -shiftY);
-      rotate(angle - PI / 2);
-      translate(-12, -15);
-      if (intProjectileType == 1)
-        image(imgFriendlyProjectile,0 ,0);
-      else if (intProjectileType == 2)
-        image(imgEnemyProjectile, 0, 0);
+      if (intProjectileType == 1) {
+        translate(x + (temp * speedXValue / 5) - shiftX, y + (temp * speedYValue / 5) - shiftY);
+        rotate(angle - PI / 2);
+        translate(-12, -15);
+
+        image(imgFriendlyProjectile, 0, 0);
+
+        // bullet collision with enemy
+        float tempX = x + (temp * speedXValue / 5) - shiftX - 12;
+        float tempY = y + (temp * speedYValue / 5) - shiftY - 15;
+        for (int i = 0; i < 10; i++) {
+          // enemies get 0.5 second I-frame
+          if (dist(tempX, tempY, enemyPosX[i] - 400 + mapPosX, enemyPosY[i] - 100 + mapPosY) < 20
+              && System.currentTimeMillis() - enemyLastHitTime[i] > 500) {
+            enemyLives[i] -= 1;
+            enemyLastHitTime[i] = System.currentTimeMillis() ;
+          }
+        }
+
+      } else if (intProjectileType == 2) {
+        float tempX = x + (temp * speedXValue / 5) - shiftX;
+        float tempY = y + (temp * speedYValue / 5) - shiftY;
+
+        if (dist(fltPlayerX, fltPlayerY, tempX, tempY) < 20 && System.currentTimeMillis() - lastHitTime > 1000) {
+          lives--;
+          lastHitTime = System.currentTimeMillis();
+        }
+        image(imgEnemyProjectile, x + (temp * speedXValue / 5) - shiftX, y + (temp * speedYValue / 5) - shiftY);
+      }
 
       popMatrix();
 
@@ -438,9 +499,8 @@ public class Sketch extends PApplet {
       projectileType.addLast(1);
       speedX.addLast(fltCurrentHorizontal / fltHyp);
       speedY.addLast(fltCurrentVertical / fltHyp);
-      dqMapX.addLast((int)mapPosX);
-      dqMapY.addLast((int)mapPosY);
-
+      dqMapX.addLast((int) mapPosX);
+      dqMapY.addLast((int) mapPosY);
 
       /*
        * given the triangle formed by the position of player,
@@ -460,6 +520,123 @@ public class Sketch extends PApplet {
       timeOfSpawn.addLast((int) (System.currentTimeMillis() - startTime));
       lastTime = (int) (System.currentTimeMillis() - startTime);
     }
+  }
+
+  /**
+   * Description: called to update enemy projectiles
+   * 
+   * No param
+   * No return
+   * 
+   * @author: Gordon Z
+   */
+  public void enemyProjectileSpawn() {
+    // check if 500 milliseconds has passed so there aren't too much projectiles.
+    if (System.currentTimeMillis() - startTime - lastTime2 > 500) {
+
+      for (int i = 0; i < 10; i++) {
+        if (enemyLives[i] > 0) {
+          // calculations of distance from mouse to center of wizard player.
+          float fltCurrentHorizontal = (enemyPosX[i] - 400 + mapPosX - (fltPlayerX));
+          float fltCurrentVertical = (enemyPosY[i] - 100 + mapPosY - (fltPlayerY));
+          float fltHyp = (float) Math.sqrt(fltCurrentHorizontal * fltCurrentHorizontal
+              + fltCurrentVertical * fltCurrentVertical);
+
+          // Adding details for the projectile to be drawn later
+          projectileX.addLast(enemyPosX[i] - 400 + mapPosX);
+          projectileY.addLast(enemyPosY[i] - 100 + mapPosY);
+          projectileType.addLast(2);
+          speedX.addLast(-fltCurrentHorizontal / fltHyp);
+          speedY.addLast(-fltCurrentVertical / fltHyp);
+          dqMapX.addLast((int) mapPosX);
+          dqMapY.addLast((int) mapPosY);
+
+          /*
+           * given the triangle formed by the position of player,
+           * mouse position, and the line y = playerX, calculate the angle.
+           * since arcsin only returns angles of [-pi/2, pi/2], additional modification
+           * is required to account for full 2pi rotation.
+           */
+          float fltAng = asin(fltCurrentVertical / fltHyp);
+          if (mouseX < fltPlayerX + 40) {
+            // if the mouse is to the left of center of wizard, modify the angle
+            fltAng = (float) (3.14159265358979323846 - fltAng);
+          }
+          angles.addLast(fltAng);
+
+          // push the time of new projectile spawn and update the last time a projectile
+          // has spawned
+          timeOfSpawn.addLast((int) (System.currentTimeMillis() - startTime));
+          lastTime2 = (int) (System.currentTimeMillis() - startTime);
+        }
+      }
+    }
+
+  }
+
+  /**
+   * Description: draws enemy accounting for scrolling map shift and enemy health
+   * 
+   * No param
+   * No return
+   * 
+   * @author: Gordon Z
+   */
+  void drawEnemy() {
+    for (int i = 0; i < 10; i++) {
+      if (enemyLives[i] > 0) {
+        if (enemyPosX[i] - 400 + mapPosX > fltPlayerX) {
+          image(imgEnemy2, enemyPosX[i] - 400 + mapPosX, enemyPosY[i] - 100 + mapPosY);
+        } else {
+          image(imgEnemy1, enemyPosX[i] - 400 + mapPosX, enemyPosY[i] - 100 + mapPosY);
+        }
+      }
+    }
+  }
+
+  /**
+   * Description: Manually spawns in the enemies positions at the start of game,
+   * put in a method to save space and look cleaner
+   * 
+   * No param
+   * No return
+   * 
+   * @author: Gordon Z
+   */
+  void manualEnemySpawn() {
+    for (int i = 0; i < 10; i++) {
+      enemyLives[i] = 15;
+    }
+    // Set specific positions for each enemy up to index 9
+    enemyPosX[0] = 1900;
+    enemyPosY[0] = 100;
+
+    enemyPosX[1] = 750;
+    enemyPosY[1] = 200;
+
+    enemyPosX[2] = 250;
+    enemyPosY[2] = 50;
+
+    enemyPosX[3] = 600;
+    enemyPosY[3] = 300;
+
+    enemyPosX[4] = 800;
+    enemyPosY[4] = 250;
+
+    enemyPosX[5] = 900;
+    enemyPosY[5] = -50;
+
+    enemyPosX[6] = 780;
+    enemyPosY[6] = -150;
+
+    enemyPosX[7] = 150;
+    enemyPosY[7] = 350;
+
+    enemyPosX[8] = 150;
+    enemyPosY[8] = 600;
+
+    enemyPosX[9] = 650;
+    enemyPosY[9] = 500;
   }
 
 }
