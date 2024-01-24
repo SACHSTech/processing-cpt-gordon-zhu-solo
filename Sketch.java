@@ -34,6 +34,8 @@ public class Sketch extends PApplet {
   PImage imglvl2;
   PImage imgFriendlyProjectile;
   PImage imgEnemyProjectile;
+  PImage imgWinScreen;
+  PImage imgLooseScreen;
 
   // initialization for enemies
   int[] enemyPosX = new int[10];
@@ -96,6 +98,9 @@ public class Sketch extends PApplet {
     imgEnemy1 = loadImage("Enemy.png");
     imgEnemy2 = loadImage("Enemy2.png");
 
+    imgWinScreen = loadImage("winScreen.jpg");
+    imgLooseScreen = loadImage("looseScreen.jpg");
+
     manualEnemySpawn();
 
   }
@@ -135,22 +140,28 @@ public class Sketch extends PApplet {
     // display lives
     noStroke();
     fill(242, 10, 25);
-    if (lives >= 1)
+    if (lives >= 0)
       rect(950, 20, 30, 30);
-    if (lives >= 2)
+    if (lives >= 10)
       rect(900, 20, 30, 30);
-    if (lives >= 3)
+    if (lives >= 20)
       rect(850, 20, 30, 30);
-    if (lives >= 4)
-      rect(800, 20, 30, 30);
-    if (lives >= 5)
-      rect(750, 20, 30, 30);
+    
 
     // game end
     if (lives <= 0) {
-      fill(255);
-      rect(0, 0, width, height);
+      image(imgLooseScreen, 0, 0);
     }
+
+    boolean endGame = true; 
+    for(int i = 0 ; i< 10; i ++){
+        if(enemyLives[i]>0)
+        endGame = false; 
+    }
+    if(endGame){
+      image(imgWinScreen, 0 , 0);
+    }
+
 
   }
 
@@ -605,10 +616,10 @@ public class Sketch extends PApplet {
    */
   void manualEnemySpawn() {
     for (int i = 0; i < 10; i++) {
-      enemyLives[i] = 15;
+      enemyLives[i] = 3;
     }
     // Set specific positions for each enemy up to index 9
-    enemyPosX[0] = 1900;
+    enemyPosX[0] = 100;
     enemyPosY[0] = 100;
 
     enemyPosX[1] = 750;
@@ -624,10 +635,10 @@ public class Sketch extends PApplet {
     enemyPosY[4] = 250;
 
     enemyPosX[5] = 900;
-    enemyPosY[5] = -50;
+    enemyPosY[5] = 50;
 
     enemyPosX[6] = 780;
-    enemyPosY[6] = -150;
+    enemyPosY[6] = 150;
 
     enemyPosX[7] = 150;
     enemyPosY[7] = 350;
