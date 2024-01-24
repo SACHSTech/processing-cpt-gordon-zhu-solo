@@ -4,6 +4,8 @@
 
 ##Objective of the game: Defeat all opponents
 
+Lore: Long ago, in the mystical land of Eldoria, a powerful and malevolent sorcerer named Malgrim sought to conquer the entire realm. To achieve his dark ambitions, he delved into magic, summoning unspeakable creatures and twisting the very fabric of reality itself, splitting himself across 10 clones. As the hero, will you be able to outskill your opponent in a 1v10 in order to break this curse and free the realm? Only time will tell as the you embark on this perilous journey into the shroud of darkness.
+
 Gameplay mechanics and/or user interaction: Use 'wasd' to move, left click/hold to shoot 
 
 Scoring: N/A

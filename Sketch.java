@@ -11,7 +11,7 @@ public class Sketch extends PApplet {
 
   // Initializing variables
   float fltPlayerX = 600;
-  float fltPlayerY = 750;
+  float fltPlayerY = 740;
   boolean boolInitialize = true;;
   float mapPosX = fltPlayerX;
   float mapPosY = fltPlayerY;
@@ -64,6 +64,7 @@ public class Sketch extends PApplet {
   Deque<Integer> dqMapX = new LinkedList<>();
   Deque<Integer> dqMapY = new LinkedList<>();
 
+  //Speed of the projectile 
   Deque<Float> speedX = new LinkedList<>();
   Deque<Float> speedY = new LinkedList<>();
 
@@ -110,9 +111,9 @@ public class Sketch extends PApplet {
    */
   public void draw() {
 
-    // loading screen --> 3 levels, one locked after another, first one tutorial
+    // loading screen --> 1 levels
     // --> each level has scrolling map
-    // --> wall detection --> reach the "door" to go to next level.
+    // --> wall detection 
 
     if (intCurrentLevel == 0) {
       image(imgBackground, 0, 0);
@@ -130,14 +131,14 @@ public class Sketch extends PApplet {
       drawMap(imglvl1);
       movement();
       if (mousePressed) {
-        ifMousePressed();
+        ifMousePressed(); 
       }
       drawEnemy();
       enemyProjectileSpawn();
       drawProjectile();
 
     }
-    // display lives
+    // display lives, each square = 10 lives
     noStroke();
     fill(242, 10, 25);
     if (lives >= 0)
@@ -153,6 +154,7 @@ public class Sketch extends PApplet {
       image(imgLooseScreen, 0, 0);
     }
 
+    //check if the game ended and won the game
     boolean endGame = true; 
     for(int i = 0 ; i< 10; i ++){
         if(enemyLives[i]>0)
@@ -265,8 +267,8 @@ public class Sketch extends PApplet {
       sumRGB[0] = 0;
       sumRGB[1] = 0;
       sumRGB[2] = 0;
-      // checks the average pixel colour moving upwards and allows the character to
-      // move upwards if its not a light or dark gray color
+      // checks the average pixel colour moving to the left and allows the character to
+      // move if its not a light or dark gray color
       if (!((avgR <= 250 && avgR >= 210 && avgB <= 230 && avgB >= 155
           && avgG <= 255 && avgG >= 220)
           || (avgR <= 70 && avgR >= 30 && avgB <= 120 && avgB >= 90
@@ -293,8 +295,8 @@ public class Sketch extends PApplet {
       sumRGB[0] = 0;
       sumRGB[1] = 0;
       sumRGB[2] = 0;
-      // checks the average pixel colour moving upwards and allows the character to
-      // move upwards if its not a light or dark gray color
+      // checks the average pixel colour moving downwards and allows the character to
+      // move  if its not a light or dark gray color
       if (!((avgR <= 250 && avgR >= 210 && avgB <= 230 && avgB >= 155
           && avgG <= 255 && avgG >= 220)
           || (avgR <= 70 && avgR >= 30 && avgB <= 120 && avgB >= 90
@@ -421,7 +423,7 @@ public class Sketch extends PApplet {
       } else if (intProjectileType == 2) {
         float tempX = x + (temp * speedXValue / 5) - shiftX;
         float tempY = y + (temp * speedYValue / 5) - shiftY;
-
+        //player get 1 sec i-frame
         if (dist(fltPlayerX, fltPlayerY, tempX, tempY) < 20 && System.currentTimeMillis() - lastHitTime > 1000) {
           lives--;
           lastHitTime = System.currentTimeMillis();
